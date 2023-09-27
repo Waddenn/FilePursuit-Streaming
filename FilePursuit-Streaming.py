@@ -29,7 +29,7 @@ def update_gif_animation(ind):
 
 def display_gif_animation():
     global gif_label, gif_image, num_frames
-    pil_image = Image.open("./loading-cude.gif")
+    pil_image = Image.open("./icon/loading-cude.gif")
     num_frames = pil_image.n_frames
 
     new_width = 150
@@ -299,7 +299,7 @@ window.grid_rowconfigure(0, weight=2)
 window.grid_rowconfigure(1, weight=1)
 window.grid_rowconfigure(2, weight=1)
 
-logo_path = "./filepursuit.png"
+logo_path = "./icon/filepursuit.png"
 with open(logo_path, "rb") as file:
     raw_data = file.read()
 
@@ -328,7 +328,7 @@ search_entry.configure(insertbackground='white')
 search_entry.bind('<FocusIn>', on_entry_focus_in)
 search_entry.bind('<FocusOut>', on_entry_focus_out)
 
-search_icon = Image.open("./glass.png")
+search_icon = Image.open("./icon/glass.png")
 search_icon = search_icon.resize((20, 20), Image.LANCZOS)
 search_icon_photo = ImageTk.PhotoImage(search_icon)
 window.search_icon_photo = search_icon_photo
