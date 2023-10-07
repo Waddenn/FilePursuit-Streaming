@@ -1,8 +1,9 @@
 import tkinter as tk
 
 class MainController:
-    def __init__(self, view=None):
+    def __init__(self, view=None, model=None):
         self.view = view
+        self.model = model
 
     def on_entry_focus_in(self, event):
         if self.view.search_entry.get() == 'Search...':
@@ -21,5 +22,6 @@ class MainController:
         self.view.search_button.config(width=20, height=20)
 
     def main_thread(self, event=None):
-        # La logique de cette fonction doit être ajoutée ici.
-        print("Recherche en cours...")
+        query = self.view.search_entry.get()
+        results = self.model.search_files(query)  # Recherche des fichiers dans le modèle
+        print(f"Résultats pour {query}:", results)
