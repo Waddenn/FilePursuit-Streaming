@@ -13,7 +13,7 @@ class MainController:
     def on_entry_focus_out(self, event):
         if not self.view.search_entry.get():
             self.view.search_entry.insert(0, 'Search...')
-            self.view.search_entry.config(fg="white", font=("Segoe UI", 12, "bold"))
+            self.view.search_entry.config(fg="gray", font=("Segoe UI", 12))
 
     def on_enter(self, event):
         self.view.search_button.config(width=25, height=25)
@@ -23,5 +23,5 @@ class MainController:
 
     def main_thread(self, event=None):
         query = self.view.search_entry.get()
-        results = self.model.search_files(query)  # Recherche des fichiers dans le modèle
-        print(f"Résultats pour {query}:", results)
+        results = self.model.search_files(query)
+        print(f"Results for {query}:", results)

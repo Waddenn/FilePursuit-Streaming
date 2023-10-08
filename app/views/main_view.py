@@ -7,13 +7,13 @@ class MainView(tk.Frame):
         super().__init__(master)
         self.controller = controller
         
-        # L'interface principale
         self.configure(bg="#04050f")
-        
-        # Initialisation des éléments
         self.setup_logo()
         self.setup_search_interface()
-        
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=2)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
         
     def setup_logo(self):
         logo_path = "./assets/icons/filepursuit.png"
@@ -44,7 +44,7 @@ class MainView(tk.Frame):
         self.search_icon_photo = ImageTk.PhotoImage(search_icon)
 
         self.search_button = tk.Button(self, image=self.search_icon_photo, command=self.controller.main_thread, bg="#04050f", fg="#FFFFFF", relief=tk.FLAT)
-        self.search_button.grid(row=2, column=0, pady=(5,0), padx=(230,0), sticky='n')  # Attention: Row 2 au lieu de Row 1
+        self.search_button.grid(row=1, column=0, pady=(5,0), padx=(230,0), sticky='n')  
         self.search_button.bind("<Enter>", self.controller.on_enter)
         self.search_button.bind("<Leave>", self.controller.on_leave)
 

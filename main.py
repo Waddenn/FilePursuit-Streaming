@@ -11,13 +11,11 @@ class App(tk.Tk):
         self.resizable(width=False, height=False)
         self.configure(bg="#04050f")
 
-        self.model = FileDatabase()  # Nouveau
-        self.controller = MainController(model=self.model)  # Modification
+        self.model = FileDatabase()
+        self.controller = MainController(model=self.model)
         self.view = MainView(self, self.controller)
         self.view.pack(expand=tk.YES, fill=tk.BOTH)
         self.controller.view = self.view
-
-        self.bind('<Tab>', self.controller.main_thread)
 
 
 if __name__ == "__main__":
