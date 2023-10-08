@@ -16,6 +16,44 @@ size_var_list = []
 size_options_list = []
 movie_links_list = []
 
+vlcWindowsPath = "C:/Program Files/VideoLAN/VLC/vlc.exe"
+vlcLinuxPath = "/usr/bin/vlc"
+vlcDarwinPath = "/Applications/VLC.app/Contents/MacOS/VLC"
+
+QUALITY_LABELS = [
+    "REMUX",
+    "ULTRA HD",
+    "WEB-DL 1080p",
+    "ULtra HDLight",
+    "1080p",
+    "HDLight 1080p",
+    "HDLight 720p",
+    "720p",
+    "Blu-Ray 1080p",
+    "4KLight",
+    "4K",
+]
+
+SECONDARY_LABELS = ["BluRay", "VFF", "HDR", "Multi", "ENG", "x264", "HD", "VF2"]
+
+
+excludeSources = [
+
+"Sermovie",
+"3rver",
+"perserver",
+"menoetius",
+"film2serial",
+"ftk.pw",
+"uploadt",
+"basnetbd",
+"dl2.",
+"dl.",
+"imdb",
+"dl8.",
+
+]
+
 def main_thread(event=None):
     display_gif_animation()
     search_button.config(state=tk.DISABLED)
@@ -73,11 +111,11 @@ def open_movie(index):
         os_name = platform.system()
 
         if os_name == "Windows":
-            vlc_path = "C:/Program Files/VideoLAN/VLC/vlc.exe"
+            vlc_path = vlcWindowsPath
         elif os_name == "Linux":
-            vlc_path = "/usr/bin/vlc"
+            vlc_path = vlcLinuxPath
         elif os_name == "Darwin":
-            vlc_path = "/Applications/VLC.app/Contents/MacOS/VLC"
+            vlc_path = vlcDarwinPath
         else:
             print("Unsupported operating system.")
             return
@@ -86,24 +124,6 @@ def open_movie(index):
 
     vlc_thread = threading.Thread(target=open_vlc)
     vlc_thread.start()
-
-
-QUALITY_LABELS = [
-    "REMUX",
-    "ULTRA HD",
-    "WEB-DL 1080p",
-    "ULtra HDLight",
-    "1080p",
-    "HDLight 1080p",
-    "HDLight 720p",
-    "720p",
-    "Blu-Ray 1080p",
-    "4KLight",
-    "4K",
-]
-
-SECONDARY_LABELS = ["BluRay", "VFF", "HDR", "Multi", "ENG", "x264", "HD", "VF2"]
-
 
 def find_labels(text, label_list):
     return [label for label in label_list if label in text]
@@ -293,20 +313,7 @@ def fetch_movie_links(title, year):
             and not size_tag.find("a")
             and not any(
                 exclude in link
-                for exclude in [
-                    "Sermovie",
-                    "3rver",
-                    "perserver",
-                    "menoetius",
-                    "film2serial",
-                    "ftk.pw",
-                    "uploadt",
-                    "basnetbd",
-                    "dl2.",
-                    "dl.",
-                    "imdb",
-                    "dl8.",
-                ]
+                for exclude in excludeSources
             )
         ):  
             size = size_tag.text
