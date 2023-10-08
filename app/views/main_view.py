@@ -1,6 +1,7 @@
 import tkinter as tk
-from tkinter import ttk
 from PIL import Image, ImageTk
+import requests
+from io import BytesIO
 
 class MainView(tk.Frame):
     def __init__(self, master, controller):
@@ -14,6 +15,7 @@ class MainView(tk.Frame):
         self.grid_rowconfigure(0, weight=2)
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=1)
+        self.buttons = []
         
     def setup_logo(self):
         logo_path = "./assets/icons/filepursuit.png"
@@ -71,5 +73,56 @@ class MainView(tk.Frame):
 
     def stop_gif_animation(self):
         self.gif_label.grid_forget()
+
+    def display_posters(self, movies):
+        for btn in self.controller.buttons: 
+            btn.grid_forget()
+        self.controller.buttons.clear()
+
+        for i, movie in enumerate(movies):
+            title, year, img_url = movie
+            try:
+                img_data = self.fetch_raw_image(img_url)  # Fetch raw image data
+                img = Image.open(BytesIO(img_data))
+                img = img.resize((250, 375), Image.LANCZOS)
+                img = ImageTk.PhotoImage(img)
+                hover_img = self.create_hovered_image(img_data)  # Use raw image data to create hover image
+                btn = self.create_button(title, img, hover_img, i)  # Pass both images to the create_button function
+                self.buttons.append(btn)
+                self.update_window_geometry(len(movies))
+            except Exception as e:
+                print(f"Error: {e}")
+
+    def create_hovered_image(self, img_data):
+        img = Image.open(BytesIO(img_data))
+        hover_img = img.resize((int(1.025 * 250), int(1.025 * 375)), Image.LANCZOS)
+        return ImageTk.PhotoImage(hover_img)
+    
+    def create_button(self, title, img, hover_img, i):
+        entry_font = ("Segoe UI", 12)
+        btn = tk.Button(self, image=img, text=title if len(title) <= 35 else title[:32] + '...',
+        compound=tk.TOP, bg='#04050f', fg='white',
+        activebackground='#04050f', relief=tk.FLAT, font=entry_font, activeforeground="white",
+        highlightthickness=0, bd='0', width=260, height=410)
+        btn.image = img
+        btn.normal_image = img
+        btn.hover_image = hover_img
+        btn.bind('<Enter>', lambda e: e.widget.config(image=e.widget.hover_image))
+        btn.bind('<Leave>', lambda e: e.widget.config(image=e.widget.normal_image))
+        btn.grid(row=0, column=i + 1, rowspan=2, padx=(0, 10) if i != len(self.controller.buttons) - 1 else (0, 30))
+        return btn
+    
+    def fetch_raw_image(self, img_url):
+        if img_url.startswith('/'):
+            img_url = 'https://trakt.tv/' + img_url
+        response = requests.get(img_url)
+        response.raise_for_status()
+        return response.content
+    
+    def update_window_geometry(self, num_movies):
+        poster_width = 268
+        window_width = (poster_width * num_movies) + 430
+        self.master.geometry(f'{window_width}x500')
+
 
 

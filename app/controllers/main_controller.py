@@ -6,6 +6,7 @@ class MainController:
     def __init__(self, view=None, model=None):
         self.view = view
         self.model = model
+        self.buttons = []
 
     def on_entry_focus_in(self, event):
         if self.view.search_entry.get() == 'Search...':
@@ -35,6 +36,7 @@ class MainController:
             html = self.model.get_html(query)
             movies = self.model.extract_movie_data(html)
             print(f"Results for {movies}:")
+            self.view.display_posters(movies)
         finally:
             self.view.after(0, self._enable_button)
             self.view.stop_gif_animation()
