@@ -3,6 +3,7 @@ from app.views.main_view import MainView
 from app.controllers.main_controller import MainController
 from app.models.model import WebDataModel
 
+
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -16,7 +17,6 @@ class App(tk.Tk):
         self.view = MainView(self, self.controller)
         self.view.pack(expand=tk.YES, fill=tk.BOTH)
         self.controller.view = self.view
-
 
 if __name__ == "__main__":
     app = App()
