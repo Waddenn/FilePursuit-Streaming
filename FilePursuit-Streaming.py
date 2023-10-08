@@ -12,6 +12,9 @@ import urllib.parse
 import subprocess
 import platform
 
+size_var_list = []
+size_options_list = []
+movie_links_list = []
 
 def main_thread(event=None):
     display_gif_animation()
@@ -344,11 +347,6 @@ def main():
     dropdown_menus = []
 
     display_posters(movies, buttons)
-
-    global size_var_list, size_options_list, movie_links_list
-    size_var_list = []
-    size_options_list = []
-    movie_links_list = []
 
     create_size_dropdowns(
         movies,
