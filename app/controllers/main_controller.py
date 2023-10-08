@@ -24,23 +24,22 @@ class MainController:
         self.view.search_button.config(width=20, height=20)
 
     def main_thread(self, event=None):
-        # Désactiver le bouton immédiatement
         self.view.search_button.config(state=tk.DISABLED)
-        
-        # Lancer la partie longue de la méthode dans un autre thread
+        self.view.setup_gif_animation()
+        self.view.start_gif_animation()
         threading.Thread(target=self._long_operation).start()
 
     def _long_operation(self):
         try:
-            # Votre code actuel
             query = self.view.search_entry.get()
             html = self.model.get_html(query)
             movies = self.model.extract_movie_data(html)
             print(f"Results for {movies}:")
         finally:
-            # Réactiver le bouton de manière thread-safe
             self.view.after(0, self._enable_button)
+            self.view.stop_gif_animation()
 
     def _enable_button(self):
         self.view.search_button.config(state=tk.NORMAL)
+
 

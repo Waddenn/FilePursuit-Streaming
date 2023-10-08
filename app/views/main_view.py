@@ -25,6 +25,7 @@ class MainView(tk.Frame):
 
         self.logo_label = tk.Label(self, image=self.logo_img, bg="#04050f")
         self.logo_label.grid(row=0, column=0)
+        
 
     def setup_search_interface(self):
         entry_font = ("Segoe UI", 12)
@@ -47,5 +48,28 @@ class MainView(tk.Frame):
         self.search_button.grid(row=1, column=0, pady=(5,0), padx=(230,0), sticky='n')  
         self.search_button.bind("<Enter>", self.controller.on_enter)
         self.search_button.bind("<Leave>", self.controller.on_leave)
+
+    def setup_gif_animation(self):
+        pil_image = Image.open("./icon/loading-cude.gif")
+        self.num_frames = pil_image.n_frames
+        new_width = 150
+        new_height = 150
+        self.gif_image = [ImageTk.PhotoImage(pil_image.copy().convert("RGBA").resize((new_width, new_height), Image.LANCZOS)) for frame in range(self.num_frames) if pil_image.seek(frame) is None]
+        self.gif_label = tk.Label(self, image=self.gif_image[0], bg="#04050f")
+        self.gif_label.grid(row=0, column=0)
+
+    def start_gif_animation(self):
+        self.update_gif_animation(0)
+
+    def update_gif_animation(self, ind):
+        try:
+            frame = self.gif_image[ind]
+            self.gif_label.configure(image=frame)
+            self.after(125, self.update_gif_animation, (ind + 1) % self.num_frames)
+        except:
+            pass
+
+    def stop_gif_animation(self):
+        self.gif_label.grid_forget()
 
 
