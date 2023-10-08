@@ -15,7 +15,8 @@ class MainView(tk.Frame):
         self.grid_rowconfigure(0, weight=2)
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=1)
-        self.buttons = []
+        self.controller.buttons = []
+
         
     def setup_logo(self):
         logo_path = "./assets/icons/filepursuit.png"
@@ -82,13 +83,13 @@ class MainView(tk.Frame):
         for i, movie in enumerate(movies):
             title, year, img_url = movie
             try:
-                img_data = self.fetch_raw_image(img_url)  # Fetch raw image data
+                img_data = self.fetch_raw_image(img_url) 
                 img = Image.open(BytesIO(img_data))
                 img = img.resize((250, 375), Image.LANCZOS)
                 img = ImageTk.PhotoImage(img)
-                hover_img = self.create_hovered_image(img_data)  # Use raw image data to create hover image
-                btn = self.create_button(title, img, hover_img, i)  # Pass both images to the create_button function
-                self.buttons.append(btn)
+                hover_img = self.create_hovered_image(img_data)  
+                btn = self.create_button(title, img, hover_img, i)  
+                self.controller.buttons.append(btn)
                 self.update_window_geometry(len(movies))
             except Exception as e:
                 print(f"Error: {e}")
@@ -101,7 +102,7 @@ class MainView(tk.Frame):
     def create_button(self, title, img, hover_img, i):
         entry_font = ("Segoe UI", 12)
         btn = tk.Button(self, image=img, text=title if len(title) <= 35 else title[:32] + '...',
-        compound=tk.TOP, bg='#04050f', fg='white',
+        compound=tk.TOP, command=lambda idx=i: self.controller.open_movie(idx), bg='#04050f', fg='white',
         activebackground='#04050f', relief=tk.FLAT, font=entry_font, activeforeground="white",
         highlightthickness=0, bd='0', width=260, height=410)
         btn.image = img
@@ -124,5 +125,57 @@ class MainView(tk.Frame):
         window_width = (poster_width * num_movies) + 430
         self.master.geometry(f'{window_width}x500')
 
+    def find_labels(self, text, label_list):
+        return [label for label in label_list if label in text]
 
+    def get_labeled_sizes(self, links, sizes):
+        
+        QUALITY_LABELS = [
+            "REMUX", "ULTRA HD", "WEB-DL 1080p", "ULtra HDLight", "1080p",
+            "HDLight 1080p", "HDLight 720p", "720p", "Blu-Ray 1080p", "4KLight", "4K"
+        ]
+        
+        SECONDARY_LABELS = ["BluRay", "VFF", "HDR", "Multi","ENG","x264","HD","VF2"]
+
+        if not links:
+            return ["Not Found"]
+
+        labeled_sizes = []
+        for size, link in zip(sizes, links):
+            quality_labels = self.find_labels(link, QUALITY_LABELS)
+            secondary_labels = self.find_labels(link, SECONDARY_LABELS)
+            all_labels = quality_labels + secondary_labels
+            labeled_size = f"{size} {' '.join(all_labels)}"
+            labeled_sizes.append(labeled_size)
+        return labeled_sizes
+
+    def create_size_dropdowns(self, movies, movie_links_list, size_var_list, size_options_list, dropdown_menus):
+        for menu in dropdown_menus:
+            menu.grid_forget()
+        dropdown_menus.clear()
+
+        for i, (title, year, _) in enumerate(movies):
+            links, sizes = self.controller.model.fetch_movie_links(title, year)
+            movie_links_list.append(links)
+            size_var = tk.StringVar(self)
+            labeled_sizes = self.get_labeled_sizes(links, sizes)
+            size_var.set(labeled_sizes[0])
+            size_var_list.append(size_var)
+            size_options_list.append(labeled_sizes)
+            size_menu = self.create_dropdown(labeled_sizes, i, size_var)
+            dropdown_menus.append(size_menu)
+
+            if all(quality == 'Not Found' for quality in labeled_sizes):
+                self.controller.buttons[i].config(state=tk.DISABLED)
+                
+    def create_dropdown(self, labeled_sizes, i, size_var):
+        size_menu = tk.OptionMenu(self, size_var, *labeled_sizes)
+        size_menu.grid(row=2, column=i + 1, pady=(0, 20), ipadx=5, ipady=5)
+        self.configure_dropdown_style(size_menu)
+        return size_menu
+
+    def configure_dropdown_style(self, menu):
+            menu.config(bg="#111c2e", fg="white", activebackground="#0f1d37",
+                        activeforeground="#3c597e", relief=tk.FLAT, highlightthickness=0, bd=0)
+            menu["menu"].config(bg="#111c2e", fg="white", activebackground="#0f1d37", activeforeground="#3c597e", bd=0)
 
