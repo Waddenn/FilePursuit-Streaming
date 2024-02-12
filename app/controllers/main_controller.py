@@ -2,7 +2,7 @@ import tkinter as tk
 import threading
 import subprocess
 import platform
-
+import os
 
 class MainController:
     def __init__(self, view=None, model=None):
@@ -26,28 +26,35 @@ class MainController:
         self.view.search_button.config(width=20, height=20)
 
     def open_movie(self, index):
-        def open_vlc():
-            selected_size = self.view.size_var_list[index].get()
-            movie_link = self.view.movie_links_list[index][
-                self.view.size_options_list[index].index(selected_size)
-            ]
+            def open_vlc():
+                selected_size = self.view.size_var_list[index].get()
+                movie_link = self.view.movie_links_list[index][
+                    self.view.size_options_list[index].index(selected_size)
+                ]
 
-            os_name = platform.system()
+                os_name = platform.system()
+                vlc_path = None
 
-            if os_name == "Windows":
-                vlc_path = "C:/Program Files/VideoLAN/VLC/vlc.exe"
-            elif os_name == "Linux":
-                vlc_path = "/usr/bin/vlc"
-            elif os_name == "Darwin":
-                vlc_path = "/Applications/VLC.app/Contents/MacOS/VLC"
-            else:
-                print("Unsupported operating system.")
-                return
+                if os_name == "Windows":
+                    vlc_path_64 = "C:/Program Files/VideoLAN/VLC/vlc.exe"
+                    vlc_path_86 = "C:/Program Files (x86)/VideoLAN/VLC/vlc.exe"
+                    if os.path.isfile(vlc_path_64):
+                        vlc_path = vlc_path_64
+                    elif os.path.isfile(vlc_path_86):
+                        vlc_path = vlc_path_86
+                elif os_name == "Linux":
+                    vlc_path = "/usr/bin/vlc"
+                elif os_name == "Darwin":
+                    vlc_path = "/Applications/VLC.app/Contents/MacOS/VLC"
 
-            subprocess.call([vlc_path, movie_link])
+                if vlc_path is None or not os.path.isfile(vlc_path):
+                    print("VLC executable not found. Please check the installation.")
+                    return
 
-        vlc_thread = threading.Thread(target=open_vlc)
-        vlc_thread.start()
+                subprocess.call([vlc_path, movie_link])
+
+            vlc_thread = threading.Thread(target=open_vlc)
+            vlc_thread.start()
 
     def main_thread(self, event=None):
         self.view.search_button.config(state=tk.DISABLED)
@@ -76,3 +83,4 @@ class MainController:
 
     def _enable_button(self):
         self.view.search_button.config(state=tk.NORMAL)
+
